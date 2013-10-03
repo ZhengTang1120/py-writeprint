@@ -29,4 +29,4 @@ for path in args.list_path :
         cpt_ok += 1
 
 print "%s / %s"%(cpt_ok, total)
-print "%s %%"%(cpt_ok / total * 100)
+print "%s %%"%(float(cpt_ok) / total * 100)

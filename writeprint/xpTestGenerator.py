@@ -33,12 +33,12 @@ ftest = open(args.testcorpus, 'r')
 json_test = json.load(ftest)
 ftest.close()
 
-
 list_ids_test = [k.encode('utf-8') for k in json_test.keys()]
 
 all_experiments = {
   "xp_mu": (('-d',), [args.diroutput],
             ('-t',), [args.testcorpus],
+            ('--ngramMinFreq',), [str(i) for i in xrange(0,1000,10)],
             ('-i',), list_ids_test)
 }
 
@@ -56,8 +56,10 @@ def print_all_experiments():
     all_xps += xps
 
   for i,xp in enumerate(all_xps):
-    print " ".join(xp), '-o %04d.json'%(int(xp[-1])), " ".join(args.list_path)
-#    print xp
+    output_file = '-o %04d-%04d.json'%(int(xp[-1]),int(xp[-3]))
+    print output_file
+    print " ".join(xp), output_file, " ".join(args.list_path)
+    exit(0)
 #    print " ".join(xp), " ".join(args.list_path)
  
 print_all_experiments()

@@ -24,6 +24,12 @@ parser.add_argument("-t", "--testcorpus", default='', type=str,
                     help="use the TESTCORPUS json file")
 parser.add_argument("-i", "--idtest", default='', type=str,
                     help="use the IDTEST in TESTCORPUS")
+
+parser.add_argument("--ngramMinFreq", default=0, type=int,
+                    help="consider only occuring > NGRAMMINFREQ")
+
+
+
 parser.add_argument('list_path', metavar='L', type=str, nargs='+',
                     help='List of path L of files containing features, a file per author')
 
@@ -89,10 +95,13 @@ for id_test, list_couple in json_test.iteritems() :
         authors_features[path] = {}
       authors_features[path][url] = features
 
+##
+# args.ngramMinFreq
+##
 
   base_vector = []
   for feat in sorted(global_features, key=global_features.get, reverse=False):
-    if(global_features[feat] > 0) :
+    if(global_features[feat] > args.ngramMinFreq) :
       base_vector.append(feat)
 
   list_vector_message = []
