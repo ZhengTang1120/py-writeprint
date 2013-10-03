@@ -24,7 +24,7 @@ while 1:
           else:
             nbCmds += 1
             print >>sys.stderr, "+ [t=%6.0f]    pid=%8d    idx=%4d/%4d "%(time.time()-start_t, pid, nbCmds, maxCmds)
-            print >>sys.stderr, "    %s"%(currentCmd)
+#            print >>sys.stderr, "    %s"%(currentCmd)
             processes[pid] = (currentCmd, time.time())
             nbProcesses += 1    
         except IndexError:
@@ -33,7 +33,7 @@ while 1:
     if pid > 0:  
       cmd, t = processes[pid]
       print >>sys.stderr, "- [t=%6.0f]    pid=%8d    dur=%6.0fs"%(time.time()-start_t, pid, time.time() - t)
-      print >>sys.stderr, "    %s"%(cmd)
+#      print >>sys.stderr, "    %s"%(cmd)
       nbProcesses -= 1
       if nbProcesses == 0:
         if nbCmds >= len(allCmds):

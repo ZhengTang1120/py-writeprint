@@ -36,7 +36,7 @@ for path in args.list_path :
     a[path].append(url)
 
 all_test_corpora = {}
-nb_iter = 50
+nb_iter = 100
 
 for i in xrange(nb_iter) :
   test = [] 

@@ -92,7 +92,7 @@ for id_test, list_couple in json_test.iteritems() :
 
   base_vector = []
   for feat in sorted(global_features, key=global_features.get, reverse=False):
-    if(global_features[feat] > 10) :
+    if(global_features[feat] > 0) :
       base_vector.append(feat)
 
   list_vector_message = []
