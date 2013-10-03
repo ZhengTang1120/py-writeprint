@@ -1,19 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import argparse
 import json
-import glob
-import pprint
 import random
+import os
 
-import sys
-sys.path.append('../')
-from sklearn import svm
+parser = argparse.ArgumentParser(description='build samples from a corpus of fetures')
 
-pattern_glob = '../data/features_liberation/*'
+parser.add_argument("-d", "--diroutput", default='./', type=str,
+                    help="extract sample in the dir DIROUTPUT")
+parser.add_argument("-o", "--fileoutput", default='sample.json', type=str,
+                    help="extract sample in the file DIROUTPUT/FILEOUTPUT")
+parser.add_argument('list_path', metavar='L', type=str, nargs='+',
+                    help='List of path L of files containing features, a file per author')
+
+args = parser.parse_args()
+
+##
+# args.diroutput
+##
+
+if not os.path.isdir(args.diroutput) :
+  print 'OUTPUTDIR %s does not exist, create it or choose an other directory'%s(args.diroutput)
+  exit(0)
+
 a = {}
 
-for path in glob.glob(pattern_glob) :
+for path in args.list_path :
   f = open(path, 'r')
   d = json.load(f)
   f.close()
@@ -31,7 +45,11 @@ for i in xrange(nb_iter) :
     test.append((path,list_url[pick]))
   all_test_corpora[str(i)] = test
 
-output_json = 'test.json'
+##
+# args.diroutput, args.fileoutput
+##
+
+output_json = os.path.join(args.diroutput, args.fileoutput)#'test.json'
 
 f = open(output_json, 'w')
 json.dump(all_test_corpora, f)
