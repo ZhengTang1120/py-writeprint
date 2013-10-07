@@ -12,6 +12,8 @@ parser.add_argument("-d", "--diroutput", default='./', type=str,
                     help="extract sample in the dir DIROUTPUT")
 parser.add_argument("-o", "--fileoutput", default='sample.json', type=str,
                     help="extract sample in the file DIROUTPUT/FILEOUTPUT")
+parser.add_argument("-n", "--nbIter", default=100, type=int,
+                    help="nb. of iterations NBITER")
 parser.add_argument('list_path', metavar='L', type=str, nargs='+',
                     help='List of path L of files containing features, a file per author')
 
@@ -38,7 +40,7 @@ for path in args.list_path :
 all_test_corpora = {}
 nb_iter = 100
 
-for i in xrange(nb_iter) :
+for i in xrange(args.nbIter) :
   test = [] 
   for path, list_url in a.iteritems() :
     pick = random.randint(0, len(list_url)-1)  
