@@ -19,10 +19,11 @@ parser.add_argument("-o", "--fileoutput", type=str, default='',
                     help="extract the infos in the file DIROUTPUT/FILEOUTPUT")
 
 parser.add_argument("-i", "--index", type=str, default='',
-                    help="")
+                    help="dir INDEX, dir containing json with features")
 
-parser.add_argument('path', metavar='P', type=str, nargs='+',
-                    help='path P of the json files to be analysed')
+parser.add_argument("-c", "--corpus", type=str, default='',
+                    help="dir CORPUS, dir containing json with documents")
+
 
 args = parser.parse_args()
 
@@ -44,6 +45,11 @@ def build_json_filename_output(path_input) :
   json_output_filename = '.'.join([root_filename, 'features', f[-1]])
   return json_output_filename
 
+def build_original_filename(path) :
+  root_dir, filename = os.path.split(path)
+  f = filename.split('.')
+  return "%s.json"%(f[0])
+  
 dict_ngram = {}
 res = {
   'global' : {
@@ -63,26 +69,33 @@ if not os.path.isdir(args.diroutput) :
   print 'OUTPUTDIR %s does not exist, create it or choose an other directory'%(args.diroutput)
   exit(0)
 
-for p in args.path :
-  f = open(p, 'r')
+glob_expression = os.path.join(args.index, '*')
+
+for p in glob.glob(glob_expression) :
+  original_filename = build_original_filename(p)
+  path_doc = os.path.join(args.corpus, original_filename)
+  f = open(path_doc, 'r')
   d = json.load(f)
   f.close()
-  print d['global'].keys()
+  print path_doc
 
   cpt_doc = 0
+  cpt_cut = 0
+  len_content = 0
   for url, info in d.iteritems() :
     dict_ngram_url = {}
-    print info.keys()
     bs_content = BeautifulSoup(info['content'])
     cut = tbs.cut_bloc(bs_content.body)    
-    cpt_cut = 0
-    len_content = 0
     for c in cut :
       cut2bs  = tbs.cut_bloc2bs_elt(c)
       for s in cut2bs.strings :
         len_content += len(s)
       cpt_cut += 1
     cpt_doc += 1
+
+  res['global']['nbMessages'] += cpt_doc
+  res['global']['nbBlocks'] += cpt_cut
+  res['global']['nbCars'] += len_content
 
   dict_ngram_author = {
     'nbMessages' : cpt_doc,
