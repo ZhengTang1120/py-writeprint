@@ -10,6 +10,12 @@ parser.add_argument("-t", "--testcorpus", default='', type=str,
                     help="use the TESTCORPUS json file")
 parser.add_argument('list_path', metavar='L', type=str, nargs='+',
                     help='List of path L of files containing features, a file per author')
+parser.add_argument("--ngramMinFreq", default=0, type=int,
+                    help="(see --ngramStepFreq)")
+parser.add_argument("--ngramMaxFreq", default=2500, type=int,
+                    help="(see --ngramStepFreq)")
+parser.add_argument("--ngramStepFreq", default=10, type=int,
+                    help="test with --ngramMinFreq in xrange(NGRAMMINFREQ, NGRAMMAXFREQ, NGRAMSTEPFREQ) (default : xrange(0, 2500, 10)")
 
 args = parser.parse_args()
 
@@ -26,7 +32,7 @@ if not os.path.isdir(args.diroutput) :
 ##
 
 if not os.path.isfile(args.testcorpus) or args.testcorpus == '' :
-  print 'TESTCORPUS %s does not exists, create it using build_jeson_corpus_test.py'%(args.testcorpus)
+  print 'TESTCORPUS %s does not exists, create it using build_json_corpus_test.py'%(args.testcorpus)
   exit(0)
 
 ftest = open(args.testcorpus, 'r')
@@ -38,7 +44,7 @@ list_ids_test = [k.encode('utf-8') for k in json_test.keys()]
 all_experiments = {
   "xp_mu": (('-d',), [args.diroutput],
             ('-t',), [args.testcorpus],
-            ('--ngramMinFreq',), [str(i) for i in xrange(0,250,1)],
+            ('--ngramMinFreq',), [str(i) for i in xrange(args.NgramMinFreq, args.ngramMaxFreq, args.ngramStepFreq)],
             ('-i',), list_ids_test)
 }
 
