@@ -24,16 +24,10 @@ def get_info(filename) :
 
 
 parser = argparse.ArgumentParser(description='Analyse results of xps')
-
-
 parser.add_argument('-r', '--dirresults', type=str,
                     help='dir DIRRESULTS : dir where results of an xp are storaged')
-
 parser.add_argument('-o', '--output', type=str, default='out_xp.json',
                     help='write data in OUTPUT')
-#parser.add_argument('list_path', metavar='L', type=str, nargs='+',
-#                    help='List of path L of files containing xp results, a file per xp')
-
 args = parser.parse_args()
 
 a = {}

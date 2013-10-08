@@ -150,6 +150,7 @@ for id_test, list_couple in json_test.iteritems() :
 # args.diroutput, args.fileoutput
 ##
 
+
 output_json = os.path.join(args.diroutput, args.fileoutput)
 f = open(output_json, 'w')
 json.dump(results, f)
