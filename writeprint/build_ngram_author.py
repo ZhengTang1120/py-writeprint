@@ -17,6 +17,8 @@ parser.add_argument("-d", "--diroutput", type=str, default='./features/',
 
 parser.add_argument("-o", "--fileoutput", type=str, default='',
                     help="extract the features in the file DIROUTPUT/FILEOUTPUT")
+parser.add_argument("-s", "--sizengram", type=int, default=3,
+                    help="extract SIZENGRAM-gram")
 
 parser.add_argument('path', metavar='P', type=str,
                     help='path P of the json files to be analysed')
@@ -79,7 +81,7 @@ for url, info in d.iteritems() :
     content = ''
     for s in cut2bs.strings :
       content += s
-    ngram_extractor(content, 3, dict_ngram_author, dict_ngram_url)
+    ngram_extractor(content, args.sizengram, dict_ngram_author, dict_ngram_url)
   res['url'][url] = dict_ngram_url
 res['global'] = dict_ngram_author
 
