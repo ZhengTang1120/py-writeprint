@@ -2,11 +2,6 @@ import json
 import sys
 import glob
 
-#sys.path.append('../tools/')
-#sys.path.append('../')
-#import tool_bs as tbs
-#from bs4 import BeautifulSoup
-
 import subprocess
 import argparse
 
@@ -16,19 +11,13 @@ def info_json(json) :
     'nb_messages' : nb_messages
   }
 
-
 parser = argparse.ArgumentParser(description='build features according a corpus')
-
 parser.add_argument("-d", "--diroutput", default='./features', type=str,
                     help="extract features for each author in the dir DIROUTPUT")
-
 parser.add_argument("--messagesMin", help="only chosse author with MESSAGESMIN < nb. messages", type=int, default=0)
-
 parser.add_argument("--messagesMax", help="only chosse author with nb. messages < MESSAGEMAX", type=int, default=10000000000)
-
 parser.add_argument("-s", "--sizengram", type=int, default=3,
                     help="extract SIZENGRAM-gram (default : -s 3)")
-
 parser.add_argument('list_path', metavar='L', type=str, nargs='+',
                     help='List of path L of files to be analysed')
 

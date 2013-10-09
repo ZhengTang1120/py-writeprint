@@ -2,24 +2,20 @@ import os
 import json
 import sys
 import glob
+import argparse
 
-sys.path.append('../tools/')
-sys.path.append('../')
+sys.path.append('../../tools/')
+sys.path.append('../../')
 import tool_bs as tbs
 from bs4 import BeautifulSoup
 
-import argparse
-
 parser = argparse.ArgumentParser(description='build features according a corpus linked to an author')
-
 parser.add_argument("-d", "--diroutput", type=str, default='./features/',
                     help="extract the features in the dir DIROUTPUT")
-
 parser.add_argument("-o", "--fileoutput", type=str, default='',
                     help="extract the features in the file DIROUTPUT/FILEOUTPUT")
 parser.add_argument("-s", "--sizengram", type=int, default=3,
                     help="extract SIZENGRAM-gram (default : -s 3)")
-
 parser.add_argument('path', metavar='P', type=str,
                     help='path P of the json files to be analysed')
 
@@ -47,7 +43,7 @@ dict_ngram = {}
 res = {}
 
 f = open(args.path, 'r')
-d = json.load(f)
+d= json.load(f)
 f.close()
 
 res = {
@@ -72,6 +68,8 @@ fileoutput = build_json_filename_output(args.path) if args.fileoutput == '' else
 output_json = os.path.join(args.diroutput, fileoutput)
 
 dict_ngram_author = {}
+
+
 for url, info in d.iteritems() :
   dict_ngram_url = {}
   bs_content = BeautifulSoup(info['content'])
@@ -88,4 +86,3 @@ res['global'] = dict_ngram_author
 f = open(output_json, 'w')
 json.dump(res, f)
 f.close()
-

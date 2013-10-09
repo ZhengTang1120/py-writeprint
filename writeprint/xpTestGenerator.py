@@ -44,7 +44,7 @@ list_ids_test = [k.encode('utf-8') for k in json_test.keys()]
 all_experiments = {
   "xp_mu": (('-d',), [args.diroutput],
             ('-t',), [args.testcorpus],
-            ('--ngramMinFreq',), [str(i) for i in xrange(args.NgramMinFreq, args.ngramMaxFreq, args.ngramStepFreq)],
+            ('--ngramMinFreq',), [str(i) for i in xrange(args.ngramMinFreq, args.ngramMaxFreq, args.ngramStepFreq)],
             ('-i',), list_ids_test)
 }
 

@@ -8,7 +8,6 @@ import os
 import re
 import glob
 
-import matplotlib.pyplot as plt
 
 def get_info(filename) :
   pattern = '([0-9]+)-([0-9]+)\.json'
@@ -31,57 +30,56 @@ args = parser.parse_args()
 
 a = {}
 
-total  = 0
-cpt_ok = 0
 
-dict_freq = {}
 
 glob_expression = os.path.join(args.dirresults, '*')
 
 res = {}
-
+set_author = set()
 
 for path in glob.glob(glob_expression) :
-#  root_dir, filename = os.path.split(path)
-#  i = get_info(filename)
-#  min_freq = i['min_freq']
-#  if min_freq not in dict_freq :
-#    dict_freq[min_freq] = {
-#      'total' : 0,
-#      'cpt_ok' : 0
-#    }
   f = open(path, 'r')
   d = json.load(f)
   f.close()
 
   for _,couples in d.iteritems() :
-    print couples
-    exit(0)
     for real_author, found_author in couples :
-      dict_freq[min_freq]['total'] +=1
-      if real_author == found_author :
-        dict_freq[min_freq]['cpt_ok'] +=1
+      set_author.add(real_author)
+      set_author.add(found_author)
+      l = [real_author, found_author]
+      k1 = "('%s','%s')"%(l[0], l[1])
+      k2 = "('%s','%s')"%(l[1], l[0])
+      if k1 not in res :
+        res[k1] = 0
+      if k2 not in res :
+        res[k2] = 0
+      res[k1] += 1
+      if k1 != k2  :
+        res[k2] += 1
 
-k = sorted(dict_freq.keys())
 
-list_x = []
-list_y = []
-for min_freq in k :
-  list_x.append(min_freq)
-  info = dict_freq[min_freq]
-  percent = float(info['cpt_ok']) / info['total'] * 100
-  list_y.append(str(percent))
+filenames = list(set_author)
+max_value = max(res.values())
+
+
+matrix = []
+for path1 in filenames :
+  line = [] 
+  for path2  in filenames :
+    k = "('%s','%s')"%(path1, path2)
+    v = 1 - float(res[k])/max_value if k in res else 0
+    line.append(v)
+  matrix.append(line)
 
 j = {
-  'data1' : {
-    'x' : list_x,
-    'y' : list_y
-  }
+  "signature" : "{'documentDistance': 'sum', 'verbose': True, 'documentFilter': ['s', 'el'], 'fileout': 'tp12.js', 'segmenter': ['a'], 'segmentDistance': 'i', 'documentDistanceFilter': ['h']}",
+  "filenames" :    filenames,
+  "corpus_scores" : matrix
 }
-
 
 #print args.output
 f = open(args.output, 'w')
 json.dump(j,f)
 f.close()
 
+exit(0)
