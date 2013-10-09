@@ -18,7 +18,7 @@ parser.add_argument("-d", "--diroutput", type=str, default='./features/',
 parser.add_argument("-o", "--fileoutput", type=str, default='',
                     help="extract the features in the file DIROUTPUT/FILEOUTPUT")
 parser.add_argument("-s", "--sizengram", type=int, default=3,
-                    help="extract SIZENGRAM-gram")
+                    help="extract SIZENGRAM-gram (default : -s 3)")
 
 parser.add_argument('path', metavar='P', type=str,
                     help='path P of the json files to be analysed')

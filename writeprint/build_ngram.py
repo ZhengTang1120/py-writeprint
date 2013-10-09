@@ -26,6 +26,9 @@ parser.add_argument("--messagesMin", help="only chosse author with MESSAGESMIN <
 
 parser.add_argument("--messagesMax", help="only chosse author with nb. messages < MESSAGEMAX", type=int, default=10000000000)
 
+parser.add_argument("-s", "--sizengram", type=int, default=3,
+                    help="extract SIZENGRAM-gram (default : -s 3)")
+
 parser.add_argument('list_path', metavar='L', type=str, nargs='+',
                     help='List of path L of files to be analysed')
 
@@ -40,7 +43,7 @@ for path in args.list_path :
   i = info_json(j)
   if not (args.messagesMin <= i['nb_messages'] <= args.messagesMax) :
     continue
-  cmd = 'python build_ngram_author.py -d %s %s'%(args.diroutput, path)
+  cmd = 'python build_ngram_author.py -s %s -d %s %s'%(args.sizengram, args.diroutput, path)
   history.append(cmd)
   print cmd
   list_cmd = cmd.split(' ')
