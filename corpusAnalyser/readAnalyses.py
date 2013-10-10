@@ -63,7 +63,7 @@ for a,i in j['authors'].iteritems() :
   lb.append(i['nbBlocks'])
   lc.append(i['nbCars'])
   lm.append(i['nbMessages'])
-
+print 'nb. author : %s'%len(j['authors'])
 print 'avg. #blocks per author ::', avg(lb), '+/-', standart_deviation(lb)
 print 'avg. #cars per author ::', avg(lc), '+/-', standart_deviation(lc)
 print 'avg. #messages per author ::', avg(lm), '+/-', standart_deviation(lm)

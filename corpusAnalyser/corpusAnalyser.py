@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 import argparse
 
-parser = argparse.ArgumentParser(description='build features according a corpus linked to an author')
+parser = argparse.ArgumentParser(description='read corpus and features')
 
 parser.add_argument("-d", "--diroutput", type=str, default='./',
                     help="extract the info in the dir DIROUTPUT")
