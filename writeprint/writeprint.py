@@ -3,7 +3,7 @@
 
 #import matplotlib.pyplot as plt
 import json
-import glob
+#import glob
 import argparse
 import os
 
@@ -13,9 +13,15 @@ sys.path.append('../')
 #import pylab as pl
 from sklearn import svm
 
+def build_vector_features(base_vector, features) :
+  v = []
+  for feature in base_vector :
+    nb_feat = 0 if feature not in features else features[feature]
+    v.append(nb_feat)
+  return v
+
 
 parser = argparse.ArgumentParser(description='run a classifier on a corpus minus a test corpus')
-
 parser.add_argument("-d", "--diroutput", default='./', type=str,
                     help="print result in the dir DIROUTPUT")
 parser.add_argument("-o", "--fileoutput", default='res.json', type=str,
@@ -24,15 +30,10 @@ parser.add_argument("-t", "--testcorpus", default='', type=str,
                     help="use the TESTCORPUS json file")
 parser.add_argument("-i", "--idtest", default='', type=str,
                     help="use the IDTEST in TESTCORPUS")
-
 parser.add_argument("--ngramMinFreq", default=0, type=int,
                     help="consider only occuring > NGRAMMINFREQ")
-
-
-
 parser.add_argument('list_path', metavar='L', type=str, nargs='+',
                     help='List of path L of files containing features, a file per author')
-
 args = parser.parse_args()
 
 ##
@@ -78,22 +79,19 @@ for id_test, list_couple in json_test.iteritems() :
     f = open(path, 'r')
     d = json.load(f)
     f.close()
-    author_features = {}
     for url in d['url'].keys() :
-#    if path == author_test and url == message_test:
       if (path, url) in set_test :
         authors_test[path] = d['url'][url]
         continue
-      features = d['url'][url]
-      author_features = {}
-      for feat,cpt in features.iteritems() :
+
+      for feat,cpt in d['url'][url].iteritems() :
         if feat not in global_features :
           global_features[feat] = 0
         global_features[feat] += cpt
 
       if path not in authors_features :
         authors_features[path] = {}
-      authors_features[path][url] = features
+      authors_features[path][url] = d['url'][url]
 
 ##
 # args.ngramMinFreq
@@ -111,11 +109,12 @@ for id_test, list_couple in json_test.iteritems() :
   cpt_author = 0
   for id_author, message in authors_features.iteritems() :
     dict_author[cpt_author] = id_author
-    for id_message, features in message.iteritems() :
-      v = []
-      for feature in base_vector :
-        nb_feat = 0 if feature not in features else features[feature]
-        v.append(nb_feat)
+    for _, features in message.iteritems() :
+      v = build_vector_features(base_vector, features)
+#      v = []
+#      for feature in base_vector :
+#        nb_feat = 0 if feature not in features else features[feature]
+#        v.append(nb_feat)
       list_vector_message.append(v)
       list_class.append(cpt_author)
     cpt_author += 1
@@ -126,30 +125,25 @@ for id_test, list_couple in json_test.iteritems() :
   svc = svm.SVC(kernel='linear', C=C).fit(list_vector_message, list_class)
 
   dict_test = {}
+  results[id_test] = []
 
   for id_author, message in authors_test.iteritems() :
-    v = []
-    for feature in base_vector :
-      nb_feat = 0 if feature not in message else message[feature]
-      v.append(nb_feat)
-    dict_test[id_author] = v
-
-  results[id_test] = []
-#  cpt_total = 0
-#  cpt_ok = 0
-  for id_author, v in dict_test.iteritems() :
+#    v = []
+#    for feature in base_vector :
+#      nb_feat = 0 if feature not in message else message[feature]
+#      v.append(nb_feat)
+#    dict_test[id_author] = v
+    v = build_vector_features(base_vector, message)
     p = svc.predict(v)
     results[id_test].append((id_author, dict_author[p[0]]))
-#    cpt_total += 1
-#    if id_author == dict_author[p[0]] :
-#      cpt_ok += 1
 
-#  print '%s :: %s / %s'%(id_test, cpt_ok, cpt_total)
+#  for id_author, v in dict_test.iteritems() :
+#    p = svc.predict(v)
+#    results[id_test].append((id_author, dict_author[p[0]]))
 
 ##
 # args.diroutput, args.fileoutput
 ##
-
 
 output_json = os.path.join(args.diroutput, args.fileoutput)
 f = open(output_json, 'w')
