@@ -32,7 +32,7 @@ for path in args.list_path :
   i = info_json(j)
   if not (args.messagesMin <= i['nb_messages'] <= args.messagesMax) :
     continue
-  cmd = 'python build_ngram_rstr.py --sizeMinRstr %s -d %s %s'%(args.sizeMinRstr, args.diroutput, path)
+  cmd = 'python build_rstr_author.py --sizeMinRstr %s -d %s %s'%(args.sizeMinRstr, args.diroutput, path)
   history.append(cmd)
   print cmd
   list_cmd = cmd.split(' ')

@@ -52,6 +52,7 @@ def print_all_experiments():
   all_xps = []
   cptout = 0
   for name, arguments in all_experiments.iteritems():
+#    xps = [['../../pypy-1.8-64/bin/pypy writeprint.py']]
     xps = [["python writeprint.py"]]
     for lst in arguments:
       new_xps = []
