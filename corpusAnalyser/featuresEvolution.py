@@ -47,18 +47,22 @@ for path in args.list_path :
         global_features[feat] = 0
       global_features[feat] += cpt
 
+
 list_x = []
 list_y = []
 cpt = 0
 sorted_global_features = sorted(global_features, key=global_features.get)
+len_global_features = len(global_features)
+cursor = 0
 
 while cpt < args.maxFreq :
   base_vector = []
-  for feat in sorted_global_features :
+  for i,feat in enumerate(sorted_global_features[cursor:]) :
     if(global_features[feat] > cpt) :
-      base_vector.append(feat)
+      cursor += i
+      break
   list_x.append(cpt)
-  list_y.append(len(base_vector))
+  list_y.append(len_global_features-cursor)
   cpt += 1
 
 res = {

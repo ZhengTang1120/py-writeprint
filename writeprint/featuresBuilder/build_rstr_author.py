@@ -65,16 +65,13 @@ if not os.path.isdir(args.diroutput) :
   print 'OUTPUTDIR %s does not exist, create it or choose an other directory'%(args.diroutput)
   exit(0)
 
-
-dict_ngram_author = {}
-
 r = Rstr_max()
 idBlock_idDoc = {}
 
-cpt_doc   = 0
-cpt_block = 0
+cpt_doc        = 0
+cpt_block      = 0
 dict_block_doc = {}
-dict_doc_url = {}
+dict_doc_url   = {}
 for url, info in d.iteritems() :
   dict_ngram_url = {}
   bs_content = BeautifulSoup(info['content'])
@@ -109,7 +106,7 @@ for (offset_end, nb), (l, start_plage) in res.iteritems():
       dict_url[url] = {}
     if feat not in dict_url[url] :
       dict_url[url][feat] = 0
-    dict_url[url][feat] += 0
+    dict_url[url][feat] += 1
 
 res = {
   'global' : global_features,

@@ -38,4 +38,4 @@ for path in args.list_path :
   list_cmd = cmd.split(' ')
   subprocess.call(list_cmd)
 
-print '[done] author considered :: %s'%(len(history))
+print '[done] #authors considered :: %s'%(len(history))
