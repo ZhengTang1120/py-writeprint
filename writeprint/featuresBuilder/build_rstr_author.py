@@ -32,12 +32,6 @@ def insert_chunk_cpt(d, chunk) :
     d[chunk] = 0
   d[chunk] += 1
 
-def ngram_extractor(su, n, d1, d2) :
-  for i in xrange(len(su) - n) :
-    chunk = su[i:i+n]
-    insert_chunk_cpt(d1, chunk)
-    insert_chunk_cpt(d2, chunk)
-
 def build_json_filename_output(path_input) :
   root_dir, filename = os.path.split(path_input)
   f = filename.split('.')
@@ -49,7 +43,7 @@ dict_ngram = {}
 res = {}
 
 f = open(args.path, 'r')
-d= json.load(f)
+d = json.load(f)
 f.close()
 
 res = {

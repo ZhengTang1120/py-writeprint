@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#import matplotlib.pyplot as plt
 import json
-#import glob
 import argparse
 import os
 
 import sys
 sys.path.append('../')
-#import numpy as np
-#import pylab as pl
 from sklearn import svm
 
 def build_vector_features(base_vector, features) :
@@ -73,9 +69,7 @@ for id_test, list_couple in json_test.iteritems() :
   global_features = {}
   authors_features = {}
   authors_test = {}
-#  pattern_glob = '../data/features_liberation/*'
-#  pattern_glob = './features_liberation/*'
-  for path in args.list_path: #glob.glob(pattern_glob) :
+  for path in args.list_path :
     f = open(path, 'r')
     d = json.load(f)
     f.close()
