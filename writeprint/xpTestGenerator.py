@@ -65,6 +65,5 @@ def print_all_experiments():
   for i,xp in enumerate(all_xps):
     output_file = '-o %04d-%04d.json'%(int(xp[-1]),int(xp[-3]))
     print " ".join(xp), output_file, " ".join(args.list_path)
-#    print " ".join(xp), " ".join(args.list_path)
  
 print_all_experiments()

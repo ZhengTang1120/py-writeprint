@@ -27,10 +27,7 @@ parser.add_argument('-r', '--dirresults', type=str,
 parser.add_argument('-o', '--output', type=str, default='out_xp.json',
                     help='write data in OUTPUT')
 args = parser.parse_args()
-
 a = {}
-
-
 
 glob_expression = os.path.join(args.dirresults, '*')
 
@@ -44,6 +41,9 @@ for path in glob.glob(glob_expression) :
 
   for _,couples in d.iteritems() :
     for real_author, found_author in couples :
+#      if re.search( 'Musseau', real_author) : #or re.search('Musseau', found_author) :
+#        print real_author.encode('utf-8'), found_author.encode('utf-8')
+
       set_author.add(real_author)
       set_author.add(found_author)
       l = [real_author, found_author]
@@ -57,22 +57,22 @@ for path in glob.glob(glob_expression) :
       if k1 != k2  :
         res[k2] += 1
 
+exit(0)
 
 filenames = list(set_author)
 max_value = max(res.values())
-
 
 matrix = []
 for path1 in filenames :
   line = [] 
   for path2  in filenames :
     k = "('%s','%s')"%(path1, path2)
-    v = 1 - float(res[k])/max_value if k in res else 0
+    v = 1 - float(res[k])/max_value if k in res else 1
     line.append(v)
   matrix.append(line)
 
 j = {
-  "signature" : "{'documentDistance': 'sum', 'verbose': True, 'documentFilter': ['s', 'el'], 'fileout': 'tp12.js', 'segmenter': ['a'], 'segmentDistance': 'i', 'documentDistanceFilter': ['h']}",
+  "signature" : "{'documentDistance': '', 'verbose': True, 'documentFilter': ['', ''], 'fileout': '', 'segmenter': ['a'], 'segmentDistance': '', 'documentDistanceFilter': ['']}",
   "filenames" :    filenames,
   "corpus_scores" : matrix
 }

@@ -54,6 +54,8 @@ for path in glob.glob(glob_expression) :
   for k,couples in d.iteritems() :
     for real_author, found_author in couples :
       dict_freq[min_freq]['total'] +=1
+#      if re.search( 'Musseau', real_author) or re.search('Musseau', found_author) :
+#        print real_author.encode('utf-8'), found_author.encode('utf-8')
       if real_author == found_author :
         dict_freq[min_freq]['cpt_ok'] +=1
 

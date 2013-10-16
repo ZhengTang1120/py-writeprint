@@ -1,8 +1,7 @@
 import json
 import sys
 import glob
-
-#import subprocess
+import os
 import argparse
 
 sys.path.append('../../tools/')
@@ -12,9 +11,6 @@ from bs4 import BeautifulSoup
 
 sys.path.append('../../rstr_max/')
 from rstr_max import *
-
-
-
 
 def info_json(json) :
   nb_messages = len(json.keys())
@@ -83,8 +79,13 @@ for path in args.list_path :
 
 print 'run rstr'
 res = r.go()
+print 'done'
+
+cpt = 0
+total = len(res)
 
 for (offset_end, nb), (l, start_plage) in res.iteritems():
+  print cpt, '/', total
   id_chaine = r.idxString[offset_end-1]
   feat = r.get_repeat(id_chaine, r.idxPos[offset_end-l], l)
 #  global_features[feat] = nb
@@ -105,19 +106,14 @@ for (offset_end, nb), (l, start_plage) in res.iteritems():
     if feat not in dict_author[author]['url'][url] :
       dict_author[author]['url'][url][feat] = 0
     dict_author[author]['url'][url][feat] += 1
+  cpt += 1
 
-for author, json in dict_author.iteritems() :
+for author, json_data in dict_author.iteritems() :
   filename = build_json_filename_output(author)
   output_json = os.path.join(args.diroutput,filename)
   f = open(output_json, 'w')
-  json.dump(json, f)
+  json.dump(json_data, f)
   f.close()
 
 print '[done] #authors considered :: %s'%(len(dict_author))
-
-#  cmd = 'python build_rstr_author.py --sizeMinRstr %s -d %s %s'%(args.sizeMinRstr, args.diroutput, path)
-#  history.append(cmd)
-#  print cmd
-#  list_cmd = cmd.split(' ')
-#  subprocess.call(list_cmd)
 

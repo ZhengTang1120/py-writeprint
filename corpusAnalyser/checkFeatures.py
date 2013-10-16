@@ -56,6 +56,7 @@ for features in list_messages_features[1:] :
   for feat in core_features_message.keys() :
     if feat not in features :
       del core_features_message[feat]
+
       
 for p in list_path[1:] :
   f = open(p, 'r')
@@ -73,10 +74,18 @@ for p in list_path[1:] :
   for url, message in d['url'].iteritems() :
     for feat in core_features_message.keys() :
       if feat not in message :
+        if feat == '.' :
+          print p
+          print url
+          print feat
         del core_features_message[feat]
 
 print 'nb. unique features in features corpus'
 print 'unique features corpus : %s'%(len(global_features))
 print 'intersection authors   : %s'%(len(core_features_author))
 print 'intersection messages  : %s'%(len(core_features_message))
+
+for k,v in core_features_message.iteritems() :
+  print k, v
+
 
