@@ -51,7 +51,7 @@ for path in args.list_path :
     y = data['y']
     plt.plot(x, y, style)
 
-plt.legend(list(name_legend), 'upper right', shadow = False)
+#plt.legend(list(name_legend), 'upper right', shadow = False)
 
 ##
 # args.logscale
