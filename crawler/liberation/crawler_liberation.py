@@ -64,9 +64,7 @@ def get_core_article(main_article) :
   re_core_compile = re.compile(re_core, re.U|re.DOTALL)
   core = re_core_compile.search(main_article)
   res['core'] = core.group(1) if core != None else ''
-
   return res
-
 
 p = {'http': 'http://proxy.unicaen.fr:3128'}
 json_author_path = './author.json'

@@ -9,7 +9,7 @@ import os
 import sys
 
 #sys.path.append('../tools/')
-sys.path.append('../')
+sys.path.append('../../')
 #import tool_bs as tbs
 from bs4 import BeautifulSoup
 
@@ -64,7 +64,7 @@ def get_core_article(main_article) :
   head = re_head_compile.search(main_article)
   res['head'] = head.group(0) if head != None else ''
 
-  re_core = '</aside>(<div[^>]*?.*?</div>)<span class="author"[^>]*?>'
+  re_core = '</aside>(<div[^>]*?.*?</(div|p)>)<span class="author"[^>]*?>'
   re_core_compile = re.compile(re_core, re.U|re.DOTALL)
   core = re_core_compile.search(main_article)
   res['core'] = core.group(1) if core != None else ''
@@ -81,12 +81,16 @@ try :
 except Exception :
   exit(0)
 
+
 core = get_core_article(main)
 
 if core['core'] == '' :
   exit(0)
 
 content = '%s %s'%(core['head'], core['core'])
+
+bs_main = BeautifulSoup(content)
+print bs_main.prettify()
 
 #print core['head']
 #bs_head = BeautifulSoup(core['head'])
@@ -95,8 +99,6 @@ content = '%s %s'%(core['head'], core['core'])
 #bs_content = BeautifulSoup(core['core'])
 #print bs_content.prettify()
 
-bs_main = BeautifulSoup(main)
-print bs_main.prettify()
 
 
 exit(0)
