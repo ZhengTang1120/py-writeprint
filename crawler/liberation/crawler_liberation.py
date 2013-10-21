@@ -38,6 +38,8 @@ def get_author_liberation(item) :
   return res
 
 def rebuild_url_liberation(suffix) :
+  if(suffix[0:3] == 'http') :
+    return suffix
   return 'http://www.liberation.fr%s'%suffix
 
 def get_main_article(source_article) :
@@ -53,10 +55,10 @@ def get_core_article(main_article) :
   title = re_title_compile.search(main_article)
   res['title'] = title.group(0) if title != None else ''
 
-  re_head = '<h2 itemprop="description"[^>]*?>.*?</h2>'
-  re_head_compile = re.compile(re_head, re.U|re.DOTALL)
-  head = re_head_compile.search(main_article)
-  res['head'] = head.group(0) if head != None else ''
+#  re_head = '<h2 itemprop="description"[^>]*?>.*?</h2>'
+#  re_head_compile = re.compile(re_head, re.U|re.DOTALL)
+#  head = re_head_compile.search(main_article)
+#  res['head'] = head.group(0) if head != None else ''
 
   re_core = '</aside>(<div[^>]*?.*?</div>)<span class="author"[^>]*?>'
   re_core_compile = re.compile(re_core, re.U|re.DOTALL)
@@ -80,7 +82,7 @@ for author in json_loaded.iterkeys() :
 
   if(os.path.exists(json_path)) :
     f = open(json_path)
-    continue
+#    continue
   else :
     f = open(json_path, 'w')
     json.dump({}, f)
@@ -90,16 +92,17 @@ for author in json_loaded.iterkeys() :
   f.close()
   while True :  
     url = url_base%(start, author.encode('utf-8'))
+    print url
     source = urllib.urlopen(url, proxies=p)
     s = source.read()
-    f = get_items_liberation(s)
+    items = get_items_liberation(s)
 
-    if len(f) == 0 :
+    if len(items) == 0 :
       break
 
     cpt_i = 0
 
-    for i in f :
+    for i in items :
       cpt_i += 1
       authors = get_author_liberation(i)
 
@@ -129,7 +132,8 @@ for author in json_loaded.iterkeys() :
       if core['core'] == '' :
         continue
 
-      content = '%s %s'%(core['head'], core['core'])
+#      content = '%s %s'%(core['head'], core['core'])
+      content = '%s'%(core['core'])
       d = {
         'author' : author,
         'published' : published,
@@ -138,12 +142,13 @@ for author in json_loaded.iterkeys() :
         'url' : url_article
       }
       json_author[url_article] = d
+
+      f = open(json_path, 'w')
+      json.dump(json_author, f)
+      f.close()
+
       r = random.uniform(0,2)
       time.sleep(r)
-
-    f = open(json_path, 'w')
-    json.dump(json_author, f)
-    f.close()
       
     start += 1
     if start > 100 :

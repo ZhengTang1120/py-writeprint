@@ -1,3 +1,4 @@
+# -*- coding:utf-8  -*-
 import re
 import urllib
 import random
@@ -16,7 +17,7 @@ def get_author_liberation(item) :
     res.append(author)
   return res
 
-q = 'journalistes'
+q = 'éducation'
 start = 1
 
 p = {'http': 'http://proxy.unicaen.fr:3128'}
@@ -33,7 +34,7 @@ else :
 json_loaded = json.load(f)
 f.close()
 
-cpt = 75
+cpt = 10000
 
 while True :
   url = 'http://www.liberation.fr/recherche/?page=%s&q=%s'%(start, q)
