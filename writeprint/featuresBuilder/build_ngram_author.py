@@ -43,7 +43,7 @@ dict_ngram = {}
 res = {}
 
 f = open(args.path, 'r')
-d= json.load(f)
+d = json.load(f)
 f.close()
 
 res = {
@@ -68,7 +68,6 @@ fileoutput = build_json_filename_output(args.path) if args.fileoutput == '' else
 output_json = os.path.join(args.diroutput, fileoutput)
 
 dict_ngram_author = {}
-
 
 for url, info in d.iteritems() :
   dict_ngram_url = {}

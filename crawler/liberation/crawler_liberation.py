@@ -38,7 +38,7 @@ def get_author_liberation(item) :
   return res
 
 def rebuild_url_liberation(suffix) :
-  if(suffix[0:3] == 'http') :
+  if(suffix[:4] == 'http') :
     return suffix
   return 'http://www.liberation.fr%s'%suffix
 
@@ -123,11 +123,13 @@ for author in json_loaded.iterkeys() :
       try :
         main = get_main_article(source_article) 
       except Exception :
+        print '[exception] %s'%url_article
         continue
 
       core = get_core_article(main)
 
       if core['core'] == '' :
+        print '[no_core] %s'%url_article
         continue
 
 #      content = '%s %s'%(core['head'], core['core'])
