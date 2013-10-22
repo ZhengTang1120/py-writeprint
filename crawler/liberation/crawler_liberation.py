@@ -55,15 +55,23 @@ def get_core_article(main_article) :
   title = re_title_compile.search(main_article)
   res['title'] = title.group(0) if title != None else ''
 
-#  re_head = '<h2 itemprop="description"[^>]*?>.*?</h2>'
-#  re_head_compile = re.compile(re_head, re.U|re.DOTALL)
-#  head = re_head_compile.search(main_article)
-#  res['head'] = head.group(0) if head != None else ''
-
   re_core = '</aside>(<div[^>]*?.*?</div>)<span class="author"[^>]*?>'
   re_core_compile = re.compile(re_core, re.U|re.DOTALL)
   core = re_core_compile.search(main_article)
   res['core'] = core.group(1) if core != None else ''
+
+  re_head = '<h2 itemprop="description"[^>]*?>.*?</h2>'
+  re_head_compile = re.compile(re_head, re.U|re.DOTALL)
+  head = re_head_compile.search(main_article)
+#  res['head'] = head.group(0) if head != None else ''
+  if head != None and core != None:
+    if head.end(0) <= core.start(1) :
+      res['head'] = head.group(0)
+    else :
+      res['head'] = ''
+  else :
+    res['head'] = ''
+
   return res
 
 p = {'http': 'http://proxy.unicaen.fr:3128'}
@@ -132,8 +140,8 @@ for author in json_loaded.iterkeys() :
         print '[no_core] %s'%url_article
         continue
 
-#      content = '%s %s'%(core['head'], core['core'])
-      content = '%s'%(core['core'])
+      content = '%s %s'%(core['head'], core['core'])
+#      content = '%s'%(core['core'])
       d = {
         'author' : author,
         'published' : published,

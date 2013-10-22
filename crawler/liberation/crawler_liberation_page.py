@@ -59,15 +59,25 @@ def get_core_article(main_article) :
   title = re_title_compile.search(main_article)
   res['title'] = title.group(0) if title != None else ''
 
-  re_head = '<h2 itemprop="description"[^>]*?>.*?</h2>'
-  re_head_compile = re.compile(re_head, re.U|re.DOTALL)
-  head = re_head_compile.search(main_article)
-  res['head'] = head.group(0) if head != None else ''
-
   re_core = '</aside>(<div[^>]*?.*?</(div|p)>)<span class="author"[^>]*?>'
   re_core_compile = re.compile(re_core, re.U|re.DOTALL)
   core = re_core_compile.search(main_article)
-  res['core'] = core.group(1) if core != None else ''
+  if core != None :
+    res['core'] = core.group(1)
+  else :
+    res['core'] = ''
+
+  re_head = '<h2 itemprop="description"[^>]*?>.*?</h2>'
+  re_head_compile = re.compile(re_head, re.U|re.DOTALL)
+  head = re_head_compile.search(main_article)
+  if head != None and core != None:
+    if head.end(0) <= core.start(1) :
+      res['head'] = head.group(0)
+    else :
+      res['head'] = ''
+  else :
+    res['head'] = ''
+
 
   return res
 

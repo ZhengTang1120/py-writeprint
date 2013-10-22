@@ -1,3 +1,4 @@
+import re
 import os
 import json
 import sys
@@ -18,8 +19,8 @@ parser = argparse.ArgumentParser(description='read corpus and features')
 #parser.add_argument("-o", "--fileoutput", type=str, default='',
 #                    help="extract the infos in the file DIROUTPUT/FILEOUTPUT")
 
-parser.add_argument("-i", "--index", type=str, default='',
-                    help="dir INDEX, dir containing json with features")
+#parser.add_argument("-i", "--index", type=str, default='',
+#                    help="dir INDEX, dir containing json with features")
 
 parser.add_argument("-c", "--corpus", type=str, default='',
                     help="dir CORPUS, dir containing json with documents")
@@ -49,6 +50,13 @@ def build_original_filename(path) :
   root_dir, filename = os.path.split(path)
   f = filename.split('.')
   return "%s.json"%(f[0])
+
+def clean_aside(source) :
+  pattern_aside = '<aside[^>]*?>.*?</aside>'
+  compile_aside = re.compile(pattern_aside, re.U|re.DOTALL|re.I)
+  source = compile_aside.sub('', source)
+  return source
+
   
 dict_ngram = {}
 res = {
@@ -60,20 +68,11 @@ res = {
   'authors' : {}
 }
 
+glob_expression = os.path.join(args.corpus, '*')
 
-##
-# args.diroutput
-##
-
-#if not os.path.isdir(args.diroutput) :
-#  print 'OUTPUTDIR %s does not exist, create it or choose an other directory'%(args.diroutput)
-#  exit(0)
-
-glob_expression = os.path.join(args.index, '*')
-
-for p in glob.glob(glob_expression) :
-  original_filename = build_original_filename(p)
-  path_doc = os.path.join(args.corpus, original_filename)
+for path_doc in glob.glob(glob_expression) :
+#  original_filename = build_original_filename(p)
+#  path_doc = os.path.join(args.corpus, original_filename)
   f = open(path_doc, 'r')
   d = json.load(f)
   f.close()
@@ -86,7 +85,9 @@ for p in glob.glob(glob_expression) :
     print url
     print info['title']
     a = raw_input()
-    bs_content = BeautifulSoup(info['content'])
+    content = clean_aside(info['content'])
+    print info.keys()
+    bs_content = BeautifulSoup(content)
     cut = tbs.cut_bloc(bs_content.body)    
 #    print bs_content.prettify()
     for c in cut :
@@ -102,32 +103,37 @@ for p in glob.glob(glob_expression) :
 #      print "*"*40
 #  exit(0)
 
-  cpt_doc = 0
-  cpt_cut = 0
-  len_content = 0
-  for url, info in d.iteritems() :
-    dict_ngram_url = {}
-    bs_content = BeautifulSoup(info['content'])
-    cut = tbs.cut_bloc(bs_content.body)    
-    for c in cut :
-      cut2bs  = tbs.cut_bloc2bs_elt(c)
-      for s in cut2bs.strings :
-        len_content += len(s)
-      cpt_cut += 1
-    cpt_doc += 1
 
-  res['global']['nbMessages'] += cpt_doc
-  res['global']['nbBlocks'] += cpt_cut
-  res['global']['nbCars'] += len_content
 
-  dict_ngram_author = {
-    'nbMessages' : cpt_doc,
-    'nbBlocks' : cpt_cut,
-    'nbCars' : len_content
-  }
-  res['authors'][p] = dict_ngram_author
 
-output_json = os.path.join(args.diroutput, args.fileoutput)
-f = open(output_json, 'w')
-json.dump(res, f)
-f.close()
+
+
+#  cpt_doc = 0
+#  cpt_cut = 0
+#  len_content = 0
+#  for url, info in d.iteritems() :
+#    dict_ngram_url = {}
+#    bs_content = BeautifulSoup(info['content'])
+#    cut = tbs.cut_bloc(bs_content.body)    
+#    for c in cut :
+#      cut2bs  = tbs.cut_bloc2bs_elt(c)
+#      for s in cut2bs.strings :
+#        len_content += len(s)
+#      cpt_cut += 1
+#    cpt_doc += 1
+#
+#  res['global']['nbMessages'] += cpt_doc
+#  res['global']['nbBlocks'] += cpt_cut
+#  res['global']['nbCars'] += len_content
+#
+#  dict_ngram_author = {
+#    'nbMessages' : cpt_doc,
+#    'nbBlocks' : cpt_cut,
+#    'nbCars' : len_content
+#  }
+#  res['authors'][p] = dict_ngram_author
+#
+#output_json = os.path.join(args.diroutput, args.fileoutput)
+#f = open(output_json, 'w')
+#json.dump(res, f)
+#f.close()
