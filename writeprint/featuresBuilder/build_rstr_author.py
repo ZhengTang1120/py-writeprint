@@ -66,18 +66,27 @@ cpt_doc        = 0
 cpt_block      = 0
 dict_block_doc = {}
 dict_doc_url   = {}
+
+#d = {
+#  'url1' : {
+#    'title' : '<h1>aaa</h1>',
+#    'content' : '<div><p>bb</p><p>cc</p></div>'
+#   },
+#  'url2' : {
+#    'title' : '<h1>aaa</h1>',
+#    'content' : '<div><p>bb</p><p>cc</p></div>'
+#   }
+#}
+
 for url, info in d.iteritems() :
   dict_ngram_url = {}
-  bs_content = BeautifulSoup(info['content'])
-  cut = tbs.cut_bloc(bs_content.body)
-  
-  for c in cut :
+  bs_content = BeautifulSoup(info['title'] + info['content'])
+  cut = tbs.cut_bloc(bs_content.body)  
+  for i, c in enumerate(cut) :
     cut2bs  = tbs.cut_bloc2bs_elt(c)
-    content = ''
-    for s in cut2bs.strings :
-      content += s
+    content = ' '.join([s.strip() for s in cut2bs.strings])
     r.add_str(content)
-    dict_block_doc[cpt_block] = cpt_doc
+    dict_block_doc[cpt_block] = (cpt_doc, i)
     cpt_block += 1
   dict_doc_url[cpt_doc] = url
   cpt_doc += 1
@@ -94,18 +103,24 @@ for (offset_end, nb), (l, start_plage) in res.iteritems():
     offset_global = r.res[o]
     offset = r.idxPos[offset_global]
     id_str = r.idxString[offset_global]
-    id_doc = dict_block_doc[id_str]
+    id_doc, id_relative_block = dict_block_doc[id_str]
     url = dict_doc_url[id_doc] 
     if url not in dict_url :
-      dict_url[url] = {}
-    if feat not in dict_url[url] :
-      dict_url[url][feat] = 0
-    dict_url[url][feat] += 1
+      dict_url[url] = {'global' : {}, 'block' : {}}
+    if feat not in dict_url[url]['global'] :
+      dict_url[url]['global'][feat] = 0
+    dict_url[url]['global'][feat] += 1
+    if id_relative_block not in dict_url[url]['block'] :
+      dict_url[url]['block'][id_relative_block] = {}
+    if feat not in dict_url[url]['block'][id_relative_block] :
+      dict_url[url]['block'][id_relative_block][feat] = 0
+    dict_url[url]['block'][id_relative_block][feat] += 1
 
 res = {
   'global' : global_features,
   'url' : dict_url
 }
+
 
 ##
 # args.fileoutput
