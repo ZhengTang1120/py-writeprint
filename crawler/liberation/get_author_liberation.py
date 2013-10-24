@@ -5,17 +5,7 @@ import random
 import time
 import json
 import os
-
-def get_author_liberation(item) :
-  re_author = '<span class="authorname">(.*?)</span>'
-  re_author_compile = re.compile(re_author, re.DOTALL|re.U)
-  fi = re_author_compile.finditer(item)
-  res = []
-  for m in fi :
-    author = m.group(1).strip()
-    re.sub("\s+", ' ', author, flags=re.DOTALL|re.U)
-    res.append(author)
-  return res
+import tool_liberation as tl
 
 q = 'éducation'
 start = 1
@@ -46,7 +36,7 @@ while True :
   if len(f) == 0 :
     break
   for i in f :
-    for a in get_author_liberation(i) :
+    for a in tl.get_author(i) :
       json_loaded[a] = ''
   print len(json_loaded.keys())
   start += 1

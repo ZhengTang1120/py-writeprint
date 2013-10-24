@@ -7,6 +7,7 @@ import time
 import json
 import os
 import sys
+import tool_liberation as tl
 
 #sys.path.append('../tools/')
 sys.path.append('../../')
@@ -87,7 +88,7 @@ url_article = sys.argv[1]
 source_article = urllib.urlopen(url_article, proxies=p).read()
 
 try :
-  main = get_main_article(source_article) 
+  main = tl.get_main_article(source_article) 
 except Exception :
   exit(0)
 
@@ -101,15 +102,6 @@ content = '%s %s'%(core['head'], core['core'])
 
 bs_main = BeautifulSoup(content)
 print bs_main.prettify()
-
-#print core['head']
-#bs_head = BeautifulSoup(core['head'])
-#print bs_head.prettify()
-
-#bs_content = BeautifulSoup(core['core'])
-#print bs_content.prettify()
-
-
 
 exit(0)
 
