@@ -75,17 +75,17 @@ for id_test, list_couple in json_test.iteritems() :
     f.close()
     for url in d['url'].keys() :
       if (path, url) in set_test :
-        authors_test[path] = d['url'][url]
+        authors_test[path] = d['url'][url]['global']
         continue
 
-      for feat,cpt in d['url'][url].iteritems() :
+      for feat,cpt in d['url'][url]['global'].iteritems() :
         if feat not in global_features :
           global_features[feat] = 0
         global_features[feat] += cpt
 
       if path not in authors_features :
         authors_features[path] = {}
-      authors_features[path][url] = d['url'][url]
+      authors_features[path][url] = d['url'][url]['global']
 
 ##
 # args.ngramMinFreq

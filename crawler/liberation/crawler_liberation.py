@@ -22,7 +22,7 @@ for author in json_loaded.iterkeys() :
 
   if(os.path.exists(json_path)) :
     f = open(json_path)
-#    continue
+    continue
   else :
     f = open(json_path, 'w')
     json.dump({}, f)
