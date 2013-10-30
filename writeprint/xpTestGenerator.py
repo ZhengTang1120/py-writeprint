@@ -17,6 +17,13 @@ parser.add_argument("--ngramMaxFreq", default=2500, type=int,
 parser.add_argument("--ngramStepFreq", default=10, type=int,
                     help="test with --ngramMinFreq in xrange(NGRAMMINFREQ, NGRAMMAXFREQ, NGRAMSTEPFREQ) (default : xrange(0, 2500, 10)")
 
+parser.add_argument("--learnType", default='doc', type=str,
+                    help="doc|block")
+parser.add_argument("--testType", default='doc', type=str,
+                    help="doc|block")
+
+
+
 args = parser.parse_args()
 
 ##
@@ -44,6 +51,8 @@ list_ids_test = [k.encode('utf-8') for k in json_test.keys()]
 all_experiments = {
   "xp_mu": (('-d',), [args.diroutput],
             ('-t',), [args.testcorpus],
+            ('--testType',), [args.testType],
+            ('--learnType',), [args.learnType],
             ('--ngramMinFreq',), [str(i) for i in xrange(args.ngramMinFreq, args.ngramMaxFreq, args.ngramStepFreq)],
             ('-i',), list_ids_test)
 }

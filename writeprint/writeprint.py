@@ -4,6 +4,7 @@
 import json
 import argparse
 import os
+import math
 
 import sys
 sys.path.append('../')
@@ -68,8 +69,7 @@ def filter_base_vector_rank(global_features, min_rank, max_rank) :
   return sorted_feat[start:end]
 
 
-def filter_base_vector_percent_rank(global_features, min_rank, max_rank) :
-  global_features = {'a':1, 'b':1, 'c':1, 'd':2, 'e':2, 'f':3}
+def filter_base_vector_percent_rank(global_features, min_percent, max_percent) :
   sorted_feat = sorted(global_features, key=global_features.get, reverse=False)
 
   previous = global_features[sorted_feat[0]]
@@ -82,46 +82,17 @@ def filter_base_vector_percent_rank(global_features, min_rank, max_rank) :
       rank[-1].append(i+1)
     previous = global_features[feat]
 
-  print '!!!'
-  exit(0)
+  nb_rank  = len(rank)
+  min_rank = int(math.ceil(nb_rank * float(min_percent) / 100))
+  max_rank = int(math.floor(nb_rank * float(max_percent) / 100))
 
-  return sorted_feat
-  start = 0
-  len_sorted_feat = len(sorted_feat)
-  end = len_sorted_feat
+  start = min(min_rank, nb_rank-max_rank)
+  end   = max(min_rank, nb_rank-max_rank)
 
-  previous = -1
-  cpt = 1
-  for i in xrange(len_sorted_feat) :
-    if cpt == min_rank :
-      start = i
-      break
-    feat = sorted_feat[i]
-    if global_features[feat] != previous :
-      cpt += 1
-    previous = global_features[feat]
-
-  previous = -1
-  cpt = 1
-  for j in xrange(len_sorted_feat) :
-    i = len_sorted_feat-j-1
-    if cpt == max_rank :
-      end = i + 1
-      break
-    feat = sorted_feat[i]
-    if global_features[feat] != previous :
-      cpt += 1
-    previous = global_features[feat]
-
-  if start > end :
-    start,end = end,start
-
-  return sorted_feat[start:end]
-
-
-
-
-
+  rank_slice  = rank[start:end]
+  start_slice = rank_slice[0][0]
+  end_slice   = rank_slice[-1][-1]
+  return sorted_feat[start_slice:end_slice+1] 
 
 def build_vector_features(base_vector, features) :
   v = []
