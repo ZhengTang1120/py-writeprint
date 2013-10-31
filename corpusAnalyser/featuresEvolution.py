@@ -13,7 +13,6 @@ sys.path.append('../')
 #import pylab as pl
 from sklearn import svm
 
-
 parser = argparse.ArgumentParser(description='evolution of the size of the base vector according frequency of features')
 
 parser.add_argument("-d", "--diroutput", default='./', type=str,
@@ -41,12 +40,11 @@ for path in args.list_path :
   d = json.load(f)
   f.close()
   for url in d['url'].keys() :
-    features = d['url'][url]
+    features = d['url'][url]['global']
     for feat,cpt in features.iteritems() :
       if feat not in global_features :
         global_features[feat] = 0
       global_features[feat] += cpt
-
 
 list_x = []
 list_y = []

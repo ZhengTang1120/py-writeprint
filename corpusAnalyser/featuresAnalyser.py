@@ -49,14 +49,14 @@ for feat in d['global'].keys() :
 
 core_features_message = {}
 list_messages_features = d['url'].values()
-for feat in list_messages_features[0].keys() :
+for feat in list_messages_features[0]['global'].keys() :
   core_features_message[feat] = True
 
 for features in list_messages_features[1:] :
   for feat in core_features_message.keys() :
-    if feat not in features :
+    if feat not in features['global'] :
       del core_features_message[feat]
-      
+
 for p in list_path[1:] :
   f = open(p, 'r')
   d = json.load(f)
@@ -72,11 +72,10 @@ for p in list_path[1:] :
 
   for url, message in d['url'].iteritems() :
     for feat in core_features_message.keys() :
-      if feat not in message :
+      if feat not in message['global'] :
         del core_features_message[feat]
 
 print 'nb. unique features in features corpus'
 print 'unique features corpus : %s'%(len(global_features))
 print 'intersection authors   : %s'%(len(core_features_author))
 print 'intersection messages  : %s'%(len(core_features_message))
-
