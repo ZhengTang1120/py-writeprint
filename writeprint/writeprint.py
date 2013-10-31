@@ -128,7 +128,7 @@ def init_features(list_path, set_test, args) :
         authors_features[path] = {}
 
       if(args.learnType == 'block') :
-        for block in  d['url'][url]['block'].keys() :
+        for block in d['url'][url]['block'].keys() :
           new_key = '%s_%s'%(url, block)
           authors_features[path][new_key] = d['url'][url]['block'][block]
 
@@ -257,11 +257,6 @@ for id_test, list_couple in json_test.iteritems() :
   results[id_test] = []
 
   for id_author, list_message in authors_test.iteritems() :
-#    v = []
-#    for feature in base_vector :
-#      nb_feat = 0 if feature not in message else message[feature]
-#      v.append(nb_feat)
-#    dict_test[id_author] = v
     res = {}
     for id_message, message in enumerate(list_message) :
       v = build_vector_features(base_vector, message)

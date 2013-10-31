@@ -22,8 +22,6 @@ parser.add_argument("--learnType", default='doc', type=str,
 parser.add_argument("--testType", default='doc', type=str,
                     help="doc|block")
 
-
-
 args = parser.parse_args()
 
 ##

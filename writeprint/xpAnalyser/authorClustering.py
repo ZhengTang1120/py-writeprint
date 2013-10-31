@@ -57,8 +57,6 @@ for path in glob.glob(glob_expression) :
       if k1 != k2  :
         res[k2] += 1
 
-exit(0)
-
 filenames = list(set_author)
 max_value = max(res.values())
 
