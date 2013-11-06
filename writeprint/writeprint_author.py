@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import json
-#import argparse
+import argparse
 import os
 import math
 
 import sys
 sys.path.append('../')
 from sklearn import svm
+
+import pprint
 
 import tool_writeprint as tw
 
@@ -64,52 +66,63 @@ else :
 ##
 
 json_test = {args.idtest : json_test[args.idtest]} if args.idtest in json_test else json_test
-results = {}
 
+results = {}
 for id_test, list_couple in json_test.iteritems() :
-  set_test = set()
+  set_test = set()# set(list_couple)
   for couple in list_couple :
     t = (couple[0], couple[1])
     set_test.add(t)
 
-  global_features, authors_features, authors_test = tw.init_features(args.list_path, set_test, args)
+  authors_global_features, authors_features, authors_test = tw.init_features_authors(args.list_path, set_test, args)
 
+  results[id_test] = {}
+  for path_author, global_features in authors_global_features.iteritems() :
 ##
 # args.ngramMinFreq, args.ngramMaxFreq
 ##
+    base_vector = filter_freq(global_features, args.ngramMinFreq, args.ngramMaxFreq)
 
-  base_vector = filter_freq(global_features, args.ngramMinFreq, args.ngramMaxFreq)
+    list_vector_message = []
+    list_class = []
+    dict_author = {}
 
-  list_vector_message = []
-  list_class = []
-  dict_author = {}
+    cpt_author = 0
+    for id_author, message in authors_features.iteritems() :
+      dict_author[cpt_author] = id_author
+      for features in message.itervalues() :
+        v = build_vector_features(base_vector, features)
+        list_vector_message.append(v)
+        list_class.append(cpt_author)
+      cpt_author += 1
 
-  cpt_author = 0
-  for id_author, message in authors_features.iteritems() :
-    dict_author[cpt_author] = id_author
-    for features in message.itervalues() :
-      v = build_vector_features(base_vector, features)
-      list_vector_message.append(v)
-      list_class.append(cpt_author)
-    cpt_author += 1
+    C = 1.
+    svc = svm.SVC(kernel='linear', C=C).fit(list_vector_message, list_class)
 
-#  svc = tw.svm_get_svc(list_vector_message, list_class)
-  C = 1.
-  svc = svm.SVC(kernel='linear', C=C, cache_size=1000).fit(list_vector_message, list_class)
-#  svc = svm.LinearSVC(C=C).fit(list_vector_message, list_class)
+    for id_author, list_message in authors_test.iteritems() :
+      res = {}
+      for message in list_message :
+        v = build_vector_features(base_vector, message)
+        p = svc.predict(v)
+        if p[0] not in res :
+          res[p[0]] = 0
+        res[p[0]] += 1
+      sorted_res = sorted(res, key=res.get, reverse=True)
+      if id_author not in results[id_test] :
+        results[id_test][id_author] = []
+      results[id_test][id_author].append((path_author, dict_author[sorted_res[0]]))
 
-#  results[id_test] = tw.svm_test_svc(svc, base_vector, authors_test, dict_author)
-  results[id_test] = []
-  for id_author, list_message in authors_test.iteritems() :
-    res = {}
-    for message in list_message :
-      v = build_vector_features(base_vector, message)
-      p = svc.predict(v)
-      if p[0] not in res :
-        res[p[0]] = 0
-      res[p[0]] += 1
-    sorted_res = sorted(res, key=res.get, reverse=True)
-    results[id_test].append((id_author, dict_author[sorted_res[0]]))
+res_output = {}
+for id_test, res in results.iteritems() :
+  res_output[id_test] = []
+  for author_to_be_found, list_couple in res.iteritems() :
+    d = {}
+    for classifier, author_found in list_couple :
+      if author_found not in d :
+        d[author_found] = 0
+      d[author_found] += 1
+    sorted_res = sorted(d, key=d.get, reverse=True)
+    res_output[id_test].append((author_to_be_found, sorted_res[0]))
 
 ##
 # args.diroutput, args.fileoutput
