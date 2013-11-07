@@ -13,7 +13,7 @@ from sklearn import svm
 ##
 
 def create_random_chromosome(len_chromosome) :
-  chromose = [random.randint(0,1)]*len(base_vector)
+  chromosome = [random.randint(0,1) for _ in xrange(len_chromosome)]
   return chromosome 
 
 def init_population(size_population, len_chromosome) :
@@ -35,9 +35,22 @@ def crossover(chromosome1, chromosome2) :
   assert(len(offspring) == len(chromosome1))
   return offspring
 
-def build_input_svm_fitness(chromosome, base_vector, authors_features, dict_author) :
+def selection(population, fitnesses) :
+  s = [(fitness, i) for i,fitness in enumerate(fitnesses)]
+  s.sort(reverse=True)
+  selected = []
+  for i in xrange(25) :
+    _, id_pop = s[i]
+    selected.append(population[id_pop])
+  return selected
+
+
+def build_input_svm_fitness(chromosome, base_vector, authors_features) :
   new_base_vector = chromosome2base_vector(chromosome, base_vector)
-  cpt_author = 0
+  cpt_author          = 0
+  dict_author         = {}
+  list_vector_message = []
+  list_class          = []
   for id_author, message in authors_features.iteritems() :
     dict_author[cpt_author] = id_author
     for features in message.itervalues() :
@@ -45,17 +58,27 @@ def build_input_svm_fitness(chromosome, base_vector, authors_features, dict_auth
       list_vector_message.append(v)
       list_class.append(cpt_author)
     cpt_author += 1
-  return new_base_vector, list_vector_message, list_class
+  return new_base_vector, list_vector_message, list_class, dict_author
 
-def fitness(chromosome, base_vector, authors_features, dict_author, authors_test) :
-  new_base_vector, list_vector_message, list_class = build_intput_svm_fitness(chromosome, base_vector, authors_features, dict_author)
+def fitness(chromosome, base_vector, authors_features, authors_test) :
+  new_base_vector, list_vector_message, list_class, dict_author = build_input_svm_fitness(chromosome, base_vector, authors_features)
   svc = svm_get_svc(list_vector_message, list_class)
   res = svm_test_svc(svc, new_base_vector, authors_test, dict_author)
-  exit(0)
+  return res2score(res)
 
 def chromosome2base_vector(chromosome, base_vector) :
   new_base_vector = [base_vector[i] for i,val in enumerate(chromosome) if val == 1]
   return new_base_vector
+
+def res2score(res) :
+  total = 0
+  ok    = 0
+  for to_be_found, found in res :
+    total += 1
+    if to_be_found == found :
+      ok += 1
+  return float(ok) / total
+
 
 ##
 # SVM specific functions
