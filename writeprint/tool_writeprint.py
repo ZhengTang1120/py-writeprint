@@ -29,24 +29,46 @@ def mutate(chromosome) :
   return mutate_chromosome
 
 def crossover(chromosome1, chromosome2) :
-  assert(len(chromosome1) == len(chromosome2))
   split = random.randint(0,len(chromosome1)-1)
   offspring = chromosome1[:split] + chromosome2[split:]
-  assert(len(offspring) == len(chromosome1))
   return offspring
 
-def selection(population, fitnesses) :
+def selection_alpha(population, fitnesses, nb=25) :
   s = [(fitness, i) for i,fitness in enumerate(fitnesses)]
   s.sort(reverse=True)
   selected = []
-  for i in xrange(25) :
+  for i in xrange(nb) :
     _, id_pop = s[i]
     selected.append(population[id_pop])
   return selected
 
+def selection(population, fitnesses, nb=25) :
+  res = []
+  s = [(i,p) for i,p in enumerate(population)]
+  size_sample = len(population) / nb
+  while 1 :
+    if(len(s) == 0) :
+      break
+    random.shuffle(s)
+    sample = []
+    for _ in xrange(size_sample) :
+      try :
+        sample.append(s.pop())
+      except Exception :
+        break
+    if len(sample) > 0 :
+      res.append(sample)
+
+  selected = []
+  for sample in res :
+    local_alphas = [(fitnesses[id_chromosome], id_chromosome) for id_chromosome,chromosome in sample]
+    local_alphas.sort(reverse=True)
+    selected.append(population[local_alphas[0][1]])
+  return selected 
+
 
 def build_input_svm_fitness(chromosome, base_vector, authors_features) :
-  new_base_vector = chromosome2base_vector(chromosome, base_vector)
+  new_base_vector     = chromosome2base_vector(chromosome, base_vector)
   cpt_author          = 0
   dict_author         = {}
   list_vector_message = []
@@ -71,14 +93,11 @@ def chromosome2base_vector(chromosome, base_vector) :
   return new_base_vector
 
 def res2score(res) :
-  total = 0
-  ok    = 0
+  ok = 0
   for to_be_found, found in res :
-    total += 1
     if to_be_found == found :
       ok += 1
-  return float(ok) / total
-
+  return float(ok) / len(res)
 
 ##
 # SVM specific functions
