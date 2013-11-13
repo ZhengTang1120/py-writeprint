@@ -93,7 +93,7 @@ for id_test, list_couple in json_test.iteritems() :
   base_vector = filter_freq(global_features, args.ngramMinFreq, args.ngramMaxFreq)
 
   nb_generations = 20
-  size_population = 60
+  size_population = 10
   population = tw.init_population(size_population, len(base_vector))
   fitness_population = []
   for chromosome in population :

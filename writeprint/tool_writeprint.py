@@ -320,5 +320,3 @@ def filter_base_vector_percent_rank(global_features, min_percent, max_percent) :
   start_slice = rank_slice[0][0]
   end_slice   = rank_slice[-1][-1]
   return sorted_feat[start_slice:end_slice+1]
-
-
