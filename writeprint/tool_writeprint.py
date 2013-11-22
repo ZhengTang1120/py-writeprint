@@ -4,6 +4,8 @@ import argparse
 import json
 import random
 import sys
+import math
+import os
 
 sys.path.append('../')
 from sklearn import svm
@@ -20,12 +22,24 @@ def init_population(size_population, len_chromosome) :
   pop = [create_random_chromosome(len_chromosome) for _ in xrange(size_population)]
   return pop
 
+def lobotomize(chromosome) :
+  l = len(chromosome)
+  mutate_chromosome = chromosome[:]
+  for i in xrange(l) :
+    if chromosome[i] == 1 and random.randint(0,l) <= l/5 : 
+      mutate_chromosome[i] = 0
+  return mutate_chromosome
+
 def mutate(chromosome) :
   l = len(chromosome)
   mutate_chromosome = chromosome[:]
   for i in xrange(l) :
     if random.randint(0,l) <= l/10 :
-      mutate_chromosome[i] = 0 if chromosome[i] == 1 else 1    
+      mutate_chromosome[i] = 0 if chromosome[i] == 1 else 1
+#    if chromosome[i] == 1 and random.randint(0,l) <= l/10 : 
+#      mutate_chromosome[i] = 0
+#    elif chromosome[i] == 0 and random.randint(0,l) <= l/10 : 
+#      mutate_chromosome[i] = 1
   return mutate_chromosome
 
 def crossover(chromosome1, chromosome2) :
@@ -45,7 +59,9 @@ def selection_alpha(population, fitnesses, nb=25) :
 def selection(population, fitnesses, nb=25) :
   res = []
   s = [(i,p) for i,p in enumerate(population)]
-  size_sample = len(population) / nb
+  if nb >= len(population) :
+    return population
+  size_sample = int(math.floor(float(len(population) / nb)))
   while 1 :
     if(len(s) == 0) :
       break
@@ -160,8 +176,10 @@ def init_features_authors(list_path, set_test, args) :
     f = open(path, 'r')
     d = json.load(f)
     f.close()
+    unicode_path = unicode(path, 'utf-8')
+#    unicode_path = unicode(os.path.abspath(path), 'utf-8')
     for url in d['url'].keys() :
-      if (unicode(path,'utf-8'), url) in set_test :
+      if (unicode_path, url) in set_test :
         if(args.testType == 'block') :
           authors_test[path] = []
           for block in d['url'][url]['block'].keys() :
@@ -189,7 +207,6 @@ def init_features_authors(list_path, set_test, args) :
         authors_features[path][url] = d['url'][url]['global']
   return authors_global_features, authors_features, authors_test
 
-
 def init_features(list_path, set_test, args) :
   global_features = {}
   authors_features = {}
@@ -199,6 +216,7 @@ def init_features(list_path, set_test, args) :
     d = json.load(f)
     f.close()
     unicode_path = unicode(path, 'utf-8')
+#    unicode_path = unicode(os.path.abspath(path), 'utf-8')
     for url in d['url'].keys() :
       if (unicode_path, url) in set_test :
         if(args.testType == 'block') :
@@ -320,3 +338,91 @@ def filter_base_vector_percent_rank(global_features, min_percent, max_percent) :
   start_slice = rank_slice[0][0]
   end_slice   = rank_slice[-1][-1]
   return sorted_feat[start_slice:end_slice+1]
+
+########
+
+def init_global_features(list_path, set_test, args) :
+  global_features = {}
+  authors_features = {}
+  authors_test = {}
+  for path in list_path :
+    f = open(path, 'r')
+    d = json.load(f)
+    f.close()
+    unicode_path = unicode(path, 'utf-8')
+#    unicode_path = unicode(os.path.abspath(path), 'utf-8')
+    for url in d['url'].keys() :
+      for feat,cpt in d['url'][url]['global'].iteritems() :
+        if feat not in global_features :
+          global_features[feat] = 0
+        global_features[feat] += cpt
+
+      if (unicode_path, url) in set_test :
+        if(args.testType == 'block') :
+          authors_test[path] = []
+          for block in d['url'][url]['block'].keys() :
+            authors_test[path].append(d['url'][url]['block'][block])
+        else :
+          authors_test[path] = [d['url'][url]['global']]
+        continue
+
+      if path not in authors_features :
+        authors_features[path] = {}
+
+      if(args.learnType == 'block') :
+        for block in d['url'][url]['block'].keys() :
+          new_key = '%s_%s'%(url, block)
+          authors_features[path][new_key] = d['url'][url]['block'][block]
+
+      else :
+        if path not in authors_features :
+          authors_features[path] = {}
+        authors_features[path][url] = d['url'][url]['global']
+  return global_features, authors_features, authors_test
+
+def extract_features(test_features) :
+  specific_test_features = {}
+  for path, list_block_features in test_features.iteritems() :
+    for features in list_block_features :
+      for feat, cpt in features.iteritems() :
+        if feat not in specific_test_features :
+          specific_test_features[feat] = 0
+        specific_test_features[feat] += cpt
+  return specific_test_features
+
+def diff_features(features1, features2) :
+  diff = {}
+  for feat, cpt_feat in features1.iteritems() :
+    new_cpt = cpt_feat - features2[feat] if feat in features2 else cpt_feat
+    diff[feat] = new_cpt
+  return diff
+
+def mask_chromosome(base_vector, diff) :
+  base_chromosome = []
+  for feat in base_vector :
+    if diff[feat] == 0 :
+      base_chromosome.append('0')
+    else :
+      base_chromosome.append('1')
+  return base_chromosome
+
+def apply_mask(chromosome, mask) :
+  for i,gene in enumerate(mask) :
+    if gene == '0' :
+      chromosome[i] = 0
+
+def apply_mask_population(list_chromosome, mask) :
+  for chromosome in list_chromosome :
+    apply_mask(chromosome, mask)
+
+def create_random_chromosome_mask(len_chromosome, mask) :
+  chromosome = []
+  for i in xrange(len_chromosome) :
+    chromosome.append(random.randint(0,1) if mask[i] == '1' else 0)
+#  chromosome = [random.randint(0,1) for i in xrange(len_chromosome) if mask[i] == 1 else 0]
+  return chromosome
+
+def init_population_mask(size_population, len_chromosome, mask) :
+  pop = [create_random_chromosome_mask(len_chromosome, mask) for _ in xrange(size_population)]
+  return pop
+
