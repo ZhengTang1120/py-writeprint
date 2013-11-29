@@ -218,34 +218,6 @@ def extract_features(test_features) :
         specific_test_features[feat] += cpt
   return specific_test_features 
 
-
-def extract_features_bak(test_features) :
-  specific_test_features = {}
-  for feat, cpt in test_features.iteritems() :
-    if feat not in specific_test_features :
-      specific_test_features[feat] = 0
-    specific_test_features[feat] += cpt
-  return specific_test_features 
-
-
-def init_test_features_bak(author_features, set_test, global_features) :
-  test_specific_features = {}
-  for path, info_path in author_features.iteritems() :
-    unicode_path = unicode(path, 'utf-8')
-    for id_block, features in info_path.iteritems() :
-      if args.learnType == 'block' :
-        raise notImplementedError('--learnType block undifined')
-      couple_test = (unicode_path, id_block)
-
-      if couple_test not in set_test :
-        continue
-      for feat, cpt_feat in features.iteritems() :
-        if feat not in test_specific_features :
-          test_specific_features[feat] = 0
-        test_specific_features[feat] += cpt_feat
-
-  return test_specific_features
-
 def diff_features(features1, features2) :
   diff = {}
   for feat, cpt_feat in features1.iteritems() :
@@ -261,6 +233,24 @@ def diff_chromosome(chromosome1, chromosome2) :
     else :
       chromosome.append(g)
   return chromosome
+
+def mask_chromosome(base_vector, diff) :
+  base_chromosome = []
+  for feat in base_vector :
+    if diff[feat] == 0 :
+      base_chromosome.append('0')
+    else :
+      base_chromosome.append('1')
+  return ''.join(base_chromosome)
+
+def apply_mask(chromosome, mask) :
+  new_chromosome = []
+  for i,gene in enumerate(mask) :
+    if gene == '0' :
+      new_chromosome.append('0')
+    else :
+      new_chromosome.append(chromosome[i])
+  chromosome = ''.join(new_chromosome)
 
 def init_features(list_path, set_test, args) :
   global_features = {}
@@ -321,7 +311,7 @@ def svm_test_svc(svc, base_vector, authors_test, dict_author) :
   return predict
 
 def chromosome2base_vector(chromosome, base_vector) :
-  new_base_vector = [base_vector[i] for i,val in enumerate(chromosome) if val == 1]
+  new_base_vector = [base_vector[i] for i,val in enumerate(chromosome) if val == '1']
   return new_base_vector
 
 def build_vector_features(base_vector, features) :
@@ -421,7 +411,8 @@ else :
 json_test = {args.idtest : json_test[args.idtest]} if args.idtest in json_test else json_test
 results = {}
 
-chromosome = [int(i) for i in args.chromosome]
+#chromosome = [int(i) for i in args.chromosome]
+fitnesses = []
 
 for id_test, list_couple in json_test.iteritems() :
   set_test = set()
@@ -431,6 +422,14 @@ for id_test, list_couple in json_test.iteritems() :
 
   global_features, authors_features, authors_test = init_global_features(args.list_path, set_test, args)
 #  authors_test = init_test_features(args.list_path, set_test, args)
+  test_features_extracted = extract_features(authors_test)
+  diff = diff_features(global_features, test_features_extracted)
+
   base_vector = filter_freq(global_features, args.ngramMinFreq, args.ngramMaxFreq)
-  fitness_chromosome = fitness(chromosome, base_vector, authors_features, authors_test)
-  print fitness_chromosome
+  mask = mask_chromosome(base_vector, diff)
+  apply_mask(args.chromosome, mask)
+
+  fitness_chromosome = fitness(args.chromosome, base_vector, authors_features, authors_test)
+  fitnesses.append(fitness_chromosome)
+
+print float(sum(fitnesses)) / len(fitnesses)

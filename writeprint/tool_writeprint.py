@@ -14,38 +14,61 @@ from sklearn import svm
 # GA functions
 ##
 
-def create_random_chromosome(len_chromosome) :
-  chromosome = [random.randint(0,1) for _ in xrange(len_chromosome)]
+#def create_random_chromosome(len_chromosome) :
+#  chromosome = [random.randint(0,1) for _ in xrange(len_chromosome)]
+#  return chromosome 
+
+def create_random_chromosome(len_chromosome, luck=1000) :
+  chromosome = [random.randint(1,luck)/luck for _ in xrange(len_chromosome)]
   return chromosome 
 
-def init_population(size_population, len_chromosome) :
-  pop = [create_random_chromosome(len_chromosome) for _ in xrange(size_population)]
+def init_population(size_population, len_chromosome, luck=1000) :
+  pop = [create_random_chromosome(len_chromosome, luck) for _ in xrange(size_population)]
   return pop
 
-def lobotomize(chromosome) :
+def lobotomize(chromosome, luck=5) :
   l = len(chromosome)
   mutate_chromosome = chromosome[:]
   for i in xrange(l) :
-    if chromosome[i] == 1 and random.randint(0,l) <= l/5 : 
+    if chromosome[i] == 1 and random.randint(1,luck) == 1 : 
       mutate_chromosome[i] = 0
   return mutate_chromosome
 
-def mutate(chromosome) :
+def trisofy(chromosome) :
+  l = len(chromosome)
+  mutate_chromosome = chromosome[:]
+  s = sum(chromosome)
+  for i in xrange(l) :
+    if chromosome[i] == 0 and random.randint(1,l) < s : 
+      mutate_chromosome[i] = 1
+  return mutate_chromosome
+
+def trisofy2(chromosome, luck=5) :
   l = len(chromosome)
   mutate_chromosome = chromosome[:]
   for i in xrange(l) :
-    if random.randint(0,l) <= l/10 :
+    if chromosome[i] == 0 and random.randint(1,luck) == 1 : 
+      mutate_chromosome[i] = 1
+  return mutate_chromosome
+
+def mutate(chromosome, luck=1000) :
+  l = len(chromosome)
+  mutate_chromosome = chromosome[:]
+  for i in xrange(l) :
+    if random.randint(1,luck) == 1 :
       mutate_chromosome[i] = 0 if chromosome[i] == 1 else 1
-#    if chromosome[i] == 1 and random.randint(0,l) <= l/10 : 
-#      mutate_chromosome[i] = 0
-#    elif chromosome[i] == 0 and random.randint(0,l) <= l/10 : 
-#      mutate_chromosome[i] = 1
   return mutate_chromosome
 
 def crossover(chromosome1, chromosome2) :
   split = random.randint(0,len(chromosome1)-1)
   offspring = chromosome1[:split] + chromosome2[split:]
   return offspring
+
+def crossover2(chromosome1, chromosome2) :
+  split = random.randint(0,len(chromosome1)-1)
+  offspring1 = chromosome1[:split] + chromosome2[split:]
+  offspring2 = chromosome2[:split] + chromosome1[split:]
+  return offspring1, offspring2
 
 def selection_alpha(population, fitnesses, nb=25) :
   s = [(fitness, i) for i,fitness in enumerate(fitnesses)]
@@ -56,7 +79,7 @@ def selection_alpha(population, fitnesses, nb=25) :
     selected.append(population[id_pop])
   return selected
 
-def selection(population, fitnesses, nb=25) :
+def selection_tournament(population, fitnesses, nb=25) :
   res = []
   s = [(i,p) for i,p in enumerate(population)]
   if nb >= len(population) :
@@ -82,6 +105,34 @@ def selection(population, fitnesses, nb=25) :
     selected.append(population[local_alphas[0][1]])
   return selected 
 
+def selection(population, fitnesses, nb=20) :
+  res = []
+  s = [(i,p) for i,p in enumerate(population)]
+#  print 'nb ::, ', nb
+  if nb >= len(population) :
+    return population
+  size_sample = int(math.floor(float(len(population)) / nb))
+#  print 'size_sample ::, ', size_sample
+  while 1 :
+    if(len(s) == 0) :
+      break
+    random.shuffle(s)
+    sample = []
+    for _ in xrange(size_sample) :
+      try :
+        sample.append(s.pop())
+      except Exception :
+        break
+    if len(sample) > 0 :
+      res.append(sample)
+
+  selected = []
+#  print 'nb_sample ::', len(res)
+  for sample in res :
+    local_alphas = [(fitnesses[id_chromosome], sum(population[id_chromosome]), id_chromosome) for id_chromosome,chromosome in sample]
+    local_alphas.sort(key=lambda x: (x[0], -x[1]), reverse=True)
+    selected.append(population[local_alphas[0][2]])
+  return selected 
 
 def build_input_svm_fitness(chromosome, base_vector, authors_features) :
   new_base_vector     = chromosome2base_vector(chromosome, base_vector)
@@ -161,7 +212,23 @@ def get_argument_parser() :
                       help="consider only occuring < NGRAMMAXFREQ")
   parser.add_argument('list_path', metavar='L', type=str, nargs='+',
                       help='List of path L of files containing features, a file per author')
+
   return parser
+
+def add_argument_parser(parser) :
+  parser.add_argument("--tmpdir", default='/data/chercheurs/brixtel/writeprint/tmp/', type=str,
+                      help="stock tempfile in TEMPFILE")
+  parser.add_argument("--processchromosome", default='/data/personnels/brixtel/SVN/py-writeprint/writeprint/writeprint_chromosome.ga.py', type=str,
+                      help="use program at path PROCESSCHROMOSOME to process a single chromosome")
+  parser.add_argument("--nbcore", default=20, type=int,
+                      help="use NBCORE cores")
+  parser.add_argument("--nbgeneration", default=100, type=int,
+                      help="loop NBGENERATION times")
+  parser.add_argument("--nbselect", default=25, type=int,
+                      help="select NBSELECT chromosome each generation")
+  return parser
+
+
 
 ##
 # utilities to read features storaged in .json
@@ -415,14 +482,13 @@ def apply_mask_population(list_chromosome, mask) :
   for chromosome in list_chromosome :
     apply_mask(chromosome, mask)
 
-def create_random_chromosome_mask(len_chromosome, mask) :
+def create_random_chromosome_mask(len_chromosome, mask, luck=1000) :
   chromosome = []
   for i in xrange(len_chromosome) :
-    chromosome.append(random.randint(0,1) if mask[i] == '1' else 0)
-#  chromosome = [random.randint(0,1) for i in xrange(len_chromosome) if mask[i] == 1 else 0]
+    chromosome.append(random.randint(1,luck)/luck if mask[i] == '1' else 0)
   return chromosome
 
-def init_population_mask(size_population, len_chromosome, mask) :
-  pop = [create_random_chromosome_mask(len_chromosome, mask) for _ in xrange(size_population)]
+def init_population_mask(size_population, len_chromosome, mask, luck=1000) :
+  pop = [create_random_chromosome_mask(len_chromosome, mask, luck) for _ in xrange(size_population)]
   return pop
 
