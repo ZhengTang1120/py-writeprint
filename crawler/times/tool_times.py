@@ -59,8 +59,9 @@ def get_url_article(item) :
   return s.group(1) if s != None else None
 
 def get_article_info(source) :
-  title, head = get_article_header(source)
-  core        = get_article_core(source)
+  title = get_article_title(source)
+  head  = get_article_header(source)
+  core  = get_article_core(source)
   return {
     'title' : title,
     'head'  : head,
@@ -86,6 +87,7 @@ def get_article_aux(url_article, proxy) :
   while True :
     source_article = urllib.urlopen(url_article, proxies=proxy).read()
     info = get_article_info(source_article)
+    print url_article
     core += info['core']
     next_url = get_next_page_article(source_article)
     if next_url == None :
@@ -96,20 +98,31 @@ def get_article_aux(url_article, proxy) :
   return core
 
 def get_article_header(source_article) :
-  pattern = '<header class="entry-header">.*?(<h1 class="entry-title">.*?</h1>).*?(<h2 class="entry-deck">.*?</h2>).*?</header>'
+  pattern = '<header class="entry-header">.*?(<h2 class="entry-deck">.*?</h2>).*?</header>'
+#  pattern = '<header class="entry-header">.*?(<h1 class="entry-title">.*?</h1>).*?(<h2 class="entry-deck">.*?</h2>).*?</header>'
+  pattern_compile = re.compile(pattern, re.DOTALL|re.U)
+  s = pattern_compile.search(source_article)
+#  title = s.group(1) if s != None else None
+  head  = s.group(1) if s != None else None
+  return head
+
+def get_article_title(source_article) :
+  pattern = '<header class="entry-header">.*?(<h1 class="entry-title">.*?</h1>).*?</header>'
   pattern_compile = re.compile(pattern, re.DOTALL|re.U)
   s = pattern_compile.search(source_article)
   title = s.group(1) if s != None else None
-  head  = s.group(2) if s != None else None
-  return title, head
+  return title
 
 def get_article_core(source_article) :
-  pattern = '<!--/.post-rail-->(.*?)</div><!--/.entry-contents-->'
+  pattern = '</div>.*?</aside>(.*?)</div>.*?<footer'
+#  pattern = '<!--/.post-rail-->(.*?)</div><!--/.entry-contents-->'
   pattern_compile = re.compile(pattern, re.DOTALL|re.U)
   s = pattern_compile.search(source_article)
   return s.group(1) if s != None else None
 
 def rebuild_url(url_article, next_url) :
+  if next_url[0] != '/' or next_url[0] != '.' :
+    return next_url
   a = urlparse(url_article)
   root_url = a.scheme + '://' + a.netloc
   new_url = root_url + next_url
@@ -121,24 +134,3 @@ def get_next_page_article(source_article) :
   s = pattern_compile.search(source_article)
   res = s.group(1) if s != None else None
   return res
-  """
-<ol class="wp-paginate">
-                <li><span class="title"></span></li>    
-            
-                <li><span class="prev">Previous Page</span></li>
-              
-              
-                <li><span class="page current">1</span></li>
-                
-              
-                <li><a href="/time/magazine/article/0,9171,984867-2,00.html" title="2" class="page">2</a></li>
-                
-              
-                <li><a href="/time/magazine/article/0,9171,984867-3,00.html" title="3" class="page">3</a></li>
-                
-              
-                <li><a href="/time/magazine/article/0,9171,984867-4,00.html" title="4" class="page">4</a></li>
-                 
-                <li><a href="/time/magazine/article/0,9171,984867-2,00.html" class="next">Next Page</a></li>
-             </ol>
-""" 

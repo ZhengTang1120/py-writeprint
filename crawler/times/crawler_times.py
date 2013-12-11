@@ -33,6 +33,7 @@ for author in json_loaded.iterkeys() :
   f.close()
 
   current_url = current_url%author
+  
   flag_stop = False
   page = 0
   while True :
@@ -91,8 +92,14 @@ for author in json_loaded.iterkeys() :
       }
       json_author[item_url] = d
 
+
       f = open(json_path, 'w')
-      json.dump(json_author, f)
+
+      try :
+        json.dump(json_author, f)
+      except :
+        json.dump(json_author, f, encoding="iso-8859-9")
+
       f.close()
 
       r = random.uniform(0,2)
