@@ -121,7 +121,7 @@ def get_article_core(source_article) :
   return s.group(1) if s != None else None
 
 def rebuild_url(url_article, next_url) :
-  if next_url[0] != '/' or next_url[0] != '.' :
+  if next_url[0] != '/' and next_url[0] != '.' :
     return next_url
   a = urlparse(url_article)
   root_url = a.scheme + '://' + a.netloc
