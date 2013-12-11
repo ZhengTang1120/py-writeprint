@@ -19,19 +19,21 @@ f_author.close()
 #item_url = 'http://entertainment.time.com/2012/10/17/the-muggles-take-manhattan-j-k-rowling-live-at-lincoln-center/'
 #item_url = 'http://content.time.com/time/magazine/article/0,9171,1900238,00.html'
 #item_url = """http://poy.time.com/2012/12/19/runner-up-tim-cook-the-technologist/"""
+#item_url = '''http://poy.time.com/2012/12/19/runner-up-tim-cook-the-technologist/2/'''
 #item_url = """http://techland.time.com/2009/07/17/fridays-nerd-news-top-five/"""
 
-#item_url = '''http://content.time.com/time/specials/packages/article/0,28804,2016836_2016859_2017095,00.html'''
+#item_url = '''http://content.time.com/time/specials/packages/article/0,28804,2016836_2016859_2017095,00.html''' #no content
 #item_url = '''http://techland.time.com/2010/05/24/the-lost-finale-reviewed-by-someone-whos-never-seen-lost-before/'''
 #item_url = '''http://techland.time.com/2010/01/15/app-club-n-o-v-a-halo-goodbye/'''
 #item_url = '''http://techland.time.com/2009/12/14/james-cameron-almost-died-making-the-abyss/'''
 
-#item_url = '''http://content.time.com/time/specials/packages/article/0,28804,1945379_1943868_1943885,00.html'''
+#item_url = '''http://content.time.com/time/specials/packages/article/0,28804,1945379_1943868_1943885,00.html''' #no content
 
 #item_url = '''http://business.time.com/2013/12/05/why-obscure-fed-policy-might-mean-higher-bank-fees/'''
-item_url = '''http://content.time.com/time/quotes/0,26174,2006289,00.html'''
+#item_url = '''http://content.time.com/time/quotes/0,26174,2006289,00.html''' #no content
+#item_url = '''http://content.time.com/time/magazine/article/0,9171,984867,00.html'''
 
-item_url = '''http://content.time.com/time/magazine/article/0,9171,984867,00.html'''
+item_url = '''http://entertainment.time.com/2013/11/19/writing-war-appropriate-stories-for-kids-a-conversation-with-suzanne-collins-and-francis-lawrence/'''
 
 
 info_article = tt.get_article(item_url, p)
@@ -42,9 +44,11 @@ except Exception, e :
   print e
   print '[exception] %s'%item_url
 
-print info_article
-print info_article['head']
+#print info_article
+print info_article['core']
+print
 print info_article['title']
+print info_article['head']
 
 exit(0)
 

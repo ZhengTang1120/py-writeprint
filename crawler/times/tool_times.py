@@ -45,12 +45,11 @@ def clean_author(author_from_item) :
     return author_from_item[3:]
   return author_from_item
 
-
 def get_title_article(item) :
   pattern = '<h3><a.*?>(.*?)</a></h3>'
   pattern_compile = re.compile(pattern, re.DOTALL|re.U)
   s = pattern_compile.search(item)
-  return s.group(1) if s != None else None
+  return s.group(1).strip(' \n\t') if s != None else None
 
 def get_url_article(item) :
   pattern = '<h3><a href="([^"]+)".*?</h3>'
@@ -98,27 +97,28 @@ def get_article_aux(url_article, proxy) :
   return core
 
 def get_article_header(source_article) :
-  pattern = '<header class="entry-header">.*?(<h2 class="entry-deck">.*?</h2>).*?</header>'
+  pattern = '<header class="entry-header">.*?(<[^<]+? class="entry-deck">.*?</[^>]+>).*?</header>'
 #  pattern = '<header class="entry-header">.*?(<h1 class="entry-title">.*?</h1>).*?(<h2 class="entry-deck">.*?</h2>).*?</header>'
   pattern_compile = re.compile(pattern, re.DOTALL|re.U)
   s = pattern_compile.search(source_article)
 #  title = s.group(1) if s != None else None
-  head  = s.group(1) if s != None else None
+  head  = s.group(1).strip(' \n\t') if s != None else None
   return head
 
 def get_article_title(source_article) :
-  pattern = '<header class="entry-header">.*?(<h1 class="entry-title">.*?</h1>).*?</header>'
+  pattern = '<header class="entry-header">.*?(<[^<]+? class="entry-title">.*?</[^>]+>).*?</header>'
   pattern_compile = re.compile(pattern, re.DOTALL|re.U)
   s = pattern_compile.search(source_article)
-  title = s.group(1) if s != None else None
+  title = s.group(1).strip(' \n\t') if s != None else None
   return title
 
 def get_article_core(source_article) :
-  pattern = '</div>.*?</aside>(.*?)</div>.*?<footer'
+  source_article = clean_comment_html(source_article)
+  pattern = '</div>.*?</aside>(.*)</div>(.*?</ol>)?\s*<footer'
 #  pattern = '<!--/.post-rail-->(.*?)</div><!--/.entry-contents-->'
   pattern_compile = re.compile(pattern, re.DOTALL|re.U)
   s = pattern_compile.search(source_article)
-  return s.group(1) if s != None else None
+  return s.group(1).strip(' \n\t') if s != None else None
 
 def rebuild_url(url_article, next_url) :
   if next_url[0] != '/' and next_url[0] != '.' :
@@ -134,3 +134,10 @@ def get_next_page_article(source_article) :
   s = pattern_compile.search(source_article)
   res = s.group(1) if s != None else None
   return res
+
+def clean_comment_html(source) :
+  source = re.sub('<!--.*?-->', '', source, re.DOTALL|re.U)
+  return source
+
+
+
