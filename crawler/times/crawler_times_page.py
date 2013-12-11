@@ -28,8 +28,8 @@ f_author.close()
 
 #item_url = '''http://content.time.com/time/specials/packages/article/0,28804,1945379_1943868_1943885,00.html'''
 
-item_url = '''http://business.time.com/2013/12/05/why-obscure-fed-policy-might-mean-higher-bank-fees/'''
-
+#item_url = '''http://business.time.com/2013/12/05/why-obscure-fed-policy-might-mean-higher-bank-fees/'''
+item_url = '''http://content.time.com/time/quotes/0,26174,2006289,00.html'''
 
 info_article = tt.get_article(item_url, p)
 
