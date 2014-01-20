@@ -22,7 +22,7 @@ for author in json_loaded.iterkeys() :
 
   if(os.path.exists(json_path)) :
     f = open(json_path)
-    continue
+#    continue
   else :
     f = open(json_path, 'w')
     json.dump({}, f)
@@ -52,14 +52,14 @@ for author in json_loaded.iterkeys() :
       if unicode(authors[0], 'utf-8') != author :
         continue
 
-      url_article = tl.get_url_liberation(i)
+      url_article = tl.get_url(i)
 #      if json_author.has_key(url_article) :
       if url_article in json_author :
         continue
 
       print url_article
 
-      published = tl.get_time_liberation(i)
+      published = tl.get_time(i)
       source_article = urllib.urlopen(url_article, proxies=p).read()
 
       try :

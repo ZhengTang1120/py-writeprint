@@ -33,7 +33,9 @@ f_author.close()
 #item_url = '''http://content.time.com/time/quotes/0,26174,2006289,00.html''' #no content
 #item_url = '''http://content.time.com/time/magazine/article/0,9171,984867,00.html'''
 
-item_url = '''http://entertainment.time.com/2013/11/19/writing-war-appropriate-stories-for-kids-a-conversation-with-suzanne-collins-and-francis-lawrence/'''
+#item_url = '''http://entertainment.time.com/2013/11/19/writing-war-appropriate-stories-for-kids-a-conversation-with-suzanne-collins-and-francis-lawrence/'''
+
+item_url = 'http://healthland.time.com/2011/11/02/just-a-few-drinks-a-week-can-boost-breast-cancer-risk/'
 
 
 info_article = tt.get_article(item_url, p)
