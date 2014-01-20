@@ -35,6 +35,7 @@ f_author.close()
 
 #item_url = '''http://entertainment.time.com/2013/11/19/writing-war-appropriate-stories-for-kids-a-conversation-with-suzanne-collins-and-francis-lawrence/'''
 
+#item_url = 'http://content.time.com/time/specials/2007/article/0,28804,1637886_1637891_1645771,00.html'
 item_url = 'http://healthland.time.com/2011/11/02/just-a-few-drinks-a-week-can-boost-breast-cancer-risk/'
 
 
